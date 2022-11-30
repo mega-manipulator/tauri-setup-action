@@ -8,22 +8,23 @@ runs:
       uses: actions/setup-node@v1
       with:
         node-version: 18
+        cache: 'yarn'
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 6.0.2
     - name: install Rust stable
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
-    - uses: pnpm/action-setup@v2
-      with:
-        version: 6.0.2
 
     - name: set npm version
       shell: bash
-      if: env.GITHUB_REF_TYPE == 'tag'
+      if: ${{ startsWith(github.ref, 'refs/tags/v') }}
       run: npm version ${{ env.GITHUB_REF_NAME }}
 
     - name: set cargo version
       shell: bash
-      if: env.GITHUB_REF_TYPE == 'tag'
+      if: ${{ startsWith(github.ref, 'refs/tags/v') }}
       working-directory: src-tauri
       env:
         RELEASE_TAG: ${{ env.GITHUB_REF_NAME }}
