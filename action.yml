@@ -20,4 +20,6 @@ runs:
     - name: set npm version
       shell: bash
       if: ${{ startsWith(github.ref, 'refs/tags/v') }}
-      run: npm version ${{ github.ref_name }}
+      env:
+        GITHUB_REF_NAME: ${{ github.ref_name }}
+      run: npm version "${GITHUB_REF_NAME:1}"
