@@ -24,4 +24,6 @@ runs:
         GITHUB_REF_NAME: ${{ github.ref_name }}
       run: |
         echo "${GITHUB_REF_NAME:1}"
+        git config --global user.email "jens.brimfors@gmail.com.com"
+        git config --global user.name "Jens Brimfors"
         npm version "${GITHUB_REF_NAME:1}"
