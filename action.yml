@@ -21,15 +21,3 @@ runs:
       shell: bash
       if: ${{ startsWith(github.ref, 'refs/tags/v') }}
       run: npm version ${{ env.GITHUB_REF_NAME }}
-
-    - name: set cargo version
-      shell: bash
-      if: ${{ startsWith(github.ref, 'refs/tags/v') }}
-      working-directory: src-tauri
-      env:
-        RELEASE_TAG: ${{ env.GITHUB_REF_NAME }}
-      run: |
-        mv Cargo.toml Cargo.toml.orig
-        sed "s/0\\.0\\.0-git/${RELEASE_TAG##*\/v}/" Cargo.toml.orig >Cargo.toml
-        mv Cargo.lock Cargo.lock.orig
-        sed "s/0\\.0\\.0-git/${RELEASE_TAG##*\/v}/" Cargo.lock.orig >Cargo.lock
