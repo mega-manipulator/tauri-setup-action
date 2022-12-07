@@ -24,8 +24,8 @@ runs:
         GITHUB_REF_NAME: ${{ github.ref_name }}
       run: |
         set -e
-        grep '"version": "0.0.0",' 'package.json'
+        grep '"version": "0.0.0-dev",' 'package.json'
         echo "${GITHUB_REF_NAME:1}"
-        sed_expr='s/"0.0.0"/"'"${GITHUB_REF_NAME:1}"'"/'
+        sed_expr='s/"0.0.0-dev"/"'"${GITHUB_REF_NAME:1}"'"/'
         echo "$sed_expr"
         sed -i -e "$sed_expr" 'package.json'
