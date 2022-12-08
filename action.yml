@@ -3,19 +3,25 @@ description: 'Setup Node, Rust, and Tauri'
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+
+    # # # # #
+    # NODE  #
+    # # # # #
+
     - name: setup node
       uses: actions/setup-node@v1
       with:
         node-version: 18
         cache: 'yarn'
+
+    - name: Yarn install
+      shell: bash
+      run: yarn && yarn build
+
     - uses: pnpm/action-setup@v2
       with:
         version: 6.0.2
-    - name: install Rust stable
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
 
     - name: set npm version
       shell: bash
@@ -29,3 +35,28 @@ runs:
         sed_expr='s/"0.0.0-dev"/"'"${GITHUB_REF_NAME:1}"'"/'
         echo "$sed_expr"
         sed -i -e "$sed_expr" 'package.json'
+
+    # # # # #
+    # RUST  #
+    # # # # #
+
+    - name: install Rust stable
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+
+    # https://github.com/actions/cache/blob/main/examples.md#rust---cargo
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Cargo build
+      run: cargo build --release
+      working-directory: src-tauri
+      shell: bash
