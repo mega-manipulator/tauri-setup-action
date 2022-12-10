@@ -20,10 +20,35 @@ runs:
     # NODE  #
     # # # # #
 
-    - name: setup node
-      uses: actions/setup-node@v1
+    - name: Install Node.js
+      uses: actions/setup-node@v3
       with:
-        node-version: 18
+        node-version: 16
+
+    - uses: pnpm/action-setup@v2
+      name: Install pnpm
+      id: pnpm-install
+      with:
+        version: 7
+        run_install: false
+
+    - name: Get pnpm store directory
+      id: pnpm-cache
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+    - uses: actions/cache@v3
+      name: Setup pnpm cache
+      with:
+        path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install
 
     - name: set npm version
       shell: bash
@@ -37,20 +62,6 @@ runs:
         sed_expr='s/"0.0.0"/"'"${GITHUB_REF_NAME:1}"'"/'
         echo "$sed_expr"
         sed -i -e "$sed_expr" 'package.json'
-
-    - name: Get npm cache directory
-      id: npm-cache
-      shell: bash
-      run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
-    - uses: actions/cache@v3
-      id: npm-cache
-      # use this to check for `cache-hit` ==>
-      if: steps.npm-cache.outputs.cache-hit != 'true'
-      with:
-        path: ${{ steps.npm-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
 
     # # # # #
     # RUST  #
