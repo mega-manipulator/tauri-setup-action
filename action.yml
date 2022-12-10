@@ -24,15 +24,6 @@ runs:
       uses: actions/setup-node@v1
       with:
         node-version: 18
-        cache: 'yarn'
-
-    - name: Yarn install
-      shell: bash
-      run: yarn && yarn build
-
-    - uses: pnpm/action-setup@v2
-      with:
-        version: 6.0.2
 
     - name: set npm version
       shell: bash
@@ -46,6 +37,20 @@ runs:
         sed_expr='s/"0.0.0"/"'"${GITHUB_REF_NAME:1}"'"/'
         echo "$sed_expr"
         sed -i -e "$sed_expr" 'package.json'
+
+    - name: Get npm cache directory
+      id: npm-cache
+      shell: bash
+      run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+    - uses: actions/cache@v3
+      id: npm-cache
+      # use this to check for `cache-hit` ==>
+      if: steps.npm-cache.outputs.cache-hit != 'true'
+      with:
+        path: ${{ steps.npm-cache-dir.outputs.dir }}
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
 
     # # # # #
     # RUST  #
@@ -66,8 +71,3 @@ runs:
           ~/.cargo/git/db/
           src-tauri/target/
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-    - name: Cargo build
-      run: cargo build --release
-      working-directory: src-tauri
-      shell: bash
