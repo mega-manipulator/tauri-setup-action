@@ -42,6 +42,10 @@ runs:
       shell: bash
       run: npm install
 
+    - name: Node Lint
+      shell: bash
+      run: npm run lint
+
     - name: set npm version
       shell: bash
       if: ${{ startsWith(github.ref, 'refs/tags/v') }}
@@ -74,3 +78,11 @@ runs:
           ~/.cargo/git/db/
           src-tauri/target/
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Rust Format check
+      shell: bash
+      run: cargo fmt --check
+
+    - name: Rust Lint
+      shell: bash
+      run: cargo clippy
