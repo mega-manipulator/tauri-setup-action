@@ -81,8 +81,10 @@ runs:
 
     - name: Rust Format check
       shell: bash
+      working-directory: src-tauri
       run: cargo fmt --check
 
     - name: Rust Lint
       shell: bash
+      working-directory: src-tauri
       run: cargo clippy
