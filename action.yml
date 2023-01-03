@@ -84,6 +84,10 @@ runs:
       working-directory: src-tauri
       run: cargo fmt --check
 
+    - name: Create /dist dir
+      shell: bash
+      run: mkdir -p dist
+
     - name: Rust Lint
       shell: bash
       working-directory: src-tauri
