@@ -87,4 +87,4 @@ runs:
     - name: Rust Lint
       shell: bash
       working-directory: src-tauri
-      run: cargo clippy
+      run: cargo clippy --release
